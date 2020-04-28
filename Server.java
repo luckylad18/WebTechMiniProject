@@ -105,6 +105,7 @@ class ClientThread extends Thread{
 
       if(read.equals("exit")){
  			System.out.println("User "+username+" went out from chatroom...");
+	                al.remove(this);
 			break;
  		}
 
