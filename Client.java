@@ -4,7 +4,6 @@ import java.net.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
-
 public class Client {
 
 	private static DataInputStream dis;
@@ -12,7 +11,7 @@ public class Client {
 	private static Socket socket;
 
 	private static String server="localhost";
-	private static String username;
+	public static String username,fileRec,fileSent;
 	private static int port=1500;
  	static reading r;
 	static Scanner in=new Scanner(System.in);
@@ -20,13 +19,16 @@ public class Client {
 	public static void main(String[] args) throws IOException {
 
 		System.out.println("Enter the username: ");
-		username = in.nextLine();
-
+		username = in.next();
+		System.out.println("Enter the path where you want to download files : ");
+		fileRec = in.next();
 		try {
 			socket = new Socket(server, port);
 			dos = new DataOutputStream(socket.getOutputStream());
 			dis = new DataInputStream(socket.getInputStream());
-			dos.writeUTF(username);dos.flush();
+			dos.writeUTF(username);
+			dos.writeUTF(fileRec);
+			dos.flush();
 
 
 		}
@@ -73,8 +75,14 @@ public class Client {
 		e.printStackTrace();
 	}
 	}
-	static  void file(){
-
+	static  void file() throws IOException{
+		System.out.println("Enter the userid of the person to send file : ");
+		String uid = in.next();
+		System.out.println("Enter the path of the file to send : ");
+		fileSent = in.next();
+		dos.writeUTF(uid);dos.flush();
+		dos.writeUTF(fileSent);dos.flush();
+		System.out.println("File sent");
 	}
 
 	static  void broadcast(){

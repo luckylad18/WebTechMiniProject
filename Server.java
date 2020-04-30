@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-
+import java.io.*;
 public class Server {
 	public static int portNumber = 1500;
 	public static boolean connect=true;
@@ -73,7 +73,7 @@ class ClientThread extends Thread{
  ArrayList al;
 	int id;
 
-	String username;
+	public String username,recPath;
 
 	ClientThread(Socket s,DataInputStream dis,DataOutputStream dos,int id,String chatroom,ArrayList al){
 		this.socket=s;
@@ -86,6 +86,7 @@ class ClientThread extends Thread{
 		//Creating both Data Stream
 		try{
 			username=dis.readUTF();
+			recPath = dis.readUTF();
 		System.out.println(username+" connected to chatroom...");
 		dos.writeUTF(chatroom);dos.flush();
 	}
@@ -105,7 +106,7 @@ class ClientThread extends Thread{
 
       if(read.equals("exit")){
  			System.out.println("User "+username+" went out from chatroom...");
-	                al.remove(this);
+			al.remove(this);
 			break;
  		}
 
@@ -148,8 +149,41 @@ class ClientThread extends Thread{
 			 ct.send("[ Private- "+username+']'+" : "+mes);
 		 }
 		 }
+	}
+		if(read.equals("file"))
+		{
+			String uname = dis.readUTF();
+			String sendPath = dis.readUTF();
+			Iterator itr = al.iterator();
+			while(itr.hasNext())
+			{
+				ClientThread ct = (ClientThread)itr.next();
+				if(ct.username.equals(uname) && ct.id!=id)
+				{
+					String recPath1 = ct.recPath;
+					try
+					{
+						FileReader fr = new FileReader(sendPath);
+						BufferedReader br = new BufferedReader(fr);
+						FileWriter fw = new FileWriter(recPath1,true);
+						String s1;
+						while((s1 = br.readLine()) != null)
+						{
+							fw.write(s1);
+							fw.flush();
+						}
+						br.close();
+						fw.close();
+						ct.send("File recieved from - " + username + ". Check the file whose path you mentioned at the start");
+						break;
+					}
+					catch(IOException e)
+					{
+						e.printStackTrace();
+					}
+				}
 			}
-
+		}
 		}
  	catch(Exception e){
  		break;
